@@ -7,7 +7,7 @@ import { login } from "../modules/auth/authService.js";
 const router = express.Router();
 
 router.post("/register", createUser);
-router.post("/:id", auth, updateUser)
+router.post("/:id", auth, updateUser);
 router.delete("/:id", auth, deleteUser);
 
 // router.get("/admin", isAdmin, findAll);
