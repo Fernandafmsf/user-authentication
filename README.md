@@ -1,49 +1,40 @@
-# User authentication 
+# User Authentication Service — Project Summary
 
-It is important to know how authentication works under the hood. 
-Importante saber como uma autenticação funciona por baixo dos panos. 
-No dia a dia em uma empresa é normal usar integraçoes para isso, mas é importante conhecer a fundo. 
+This repository implements a modular user authentication API built with Node.js, Express, and Prisma (PostgreSQL). It demonstrates a production-oriented architecture for authentication and user management, including database migrations, secure password handling, role support, and middleware for authorization and error handling.
 
-- Needed to install an adapter so prisma on v7.8 could work 
+### Key implementations and responsibilities:
+- `prisma/schema.prisma`: `User` model defined (primary `id` as `Int`) and migrations tracked in `prisma/migrations` (including a migration that adds `role`).
+- Database connection initialized in `src/database/prisma.js` using the Prisma client.
+- Authentication flow implemented across `src/modules/auth/*`: registration, login (JWT issuance), and logout (token blacklist in `src/utils/tokenBlacklist.js`).
+- User management endpoints in `src/modules/user/*` and `src/routes/user.routes.js`: register, list, and remove users.
+- Passwords hashed with `bcrypt`; tokens managed with JWT.
+- Middleware: `src/middleware/auth.js` for protected routes, `src/middleware/isAdmin.js` for role-based access, and `src/middleware/errorHandler.js` for centralized error handling.
+- Project structure separates `controllers`, `services`, and `repositories` to enforce clear responsibilities and testability.
+- A compatibility adapter was added so Prisma v7.8 works correctly with the project setup.
 
-## Visão geral
+## Tech stack
+- Node.js + Express
+- Prisma ORM + PostgreSQL
+- bcrypt for password hashing
+- JSON Web Tokens (JWT) for authentication
 
-API simples de autenticação e gerenciamento de usuários usando Prisma + Postgres.
-
-Principais responsabilidades implementadas no repositório:
-- Modelo `User` definido em `prisma/schema.prisma` (campo `id` é `Int`).
-- Conexão com o banco via `src/database/prisma.js`.
-- Rotas e módulos separados: `src/modules/user/*`, `src/routes/*` e `src/middleware/*`.
-- Operações básicas de usuário: registro, listagem e remoção (endpoints em `src/routes/user.routes.js`).
-
-## Como rodar
-
-1. Copie o `.env` com `DATABASE_URL` configurado.
-2. Instale dependências:
+### How to run (development)
+1. Create a `.env` file with `DATABASE_URL` pointing to your Postgres instance.
+2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-3. Inicie em modo dev:
+3. Start in development mode:
 
 ```bash
 npm run dev
 ```
 
-## O que foi desenvolvido (resumo)
+### Notes and decisions
+- The `User.id` is implemented as `Int` in the Prisma schema to match project requirements and existing migrations.
+- Role support was added via the migration `20260521012038_add_role`.
+- The repository favors a clean modular layout to simplify maintenance and future extensions (e.g., OAuth providers, email verification).
+- Decided to use a blacklist to revoke the tokens easier for now.
 
-- Estrutura modular com `controllers`, `services` e `repository` para separar responsabilidades.
-- Uso de `Prisma` como ORM e `bcrypt` para hashing de senhas.
-- Rotas organizadas em `src/routes` e middleware de autenticação localizado em `src/middleware`.
-
-## Próximas melhorias (to-do)
-
-Lista inicial de prioridades:
-
-1. Adicionar validação de entrada (ex.: `zod`/`express-validator`) para todas as rotas.
-2. Implementar o fluxo de `refresh token` (armazenamento seguro e rotação de tokens).
-3. Empacotar a aplicação em container e adicionar pipeline CI/CD (Dockerfile + GitHub Actions/GitLab CI).
-
---
-Arquivo principal: [README.md](README.md)
